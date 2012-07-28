@@ -1,0 +1,53 @@
+#!/bin/sh
+#
+# Jon Kirkpatrick
+# git-fu -- Sometimes you just want to apply some kung fu to git.
+#
+# Licenses suck. Do whatever you want. But its your fault, not git fu's.
+
+
+warn() { echo "$@" >&2; }
+die() { warn "$@"; exit 1; }
+
+require_git_repo() {
+	if ! git rev-parse --git-dir >/dev/null 2>&1; then
+		die "fatal: Not a git repository"
+	fi
+}
+
+git_current_branch() {
+	git branch --no-color | grep '^\* ' | grep -v 'no branch' | sed 's/^* //g'
+}
+
+usage() {
+	echo "usage: git fu <subcommand>"
+	echo
+	echo "Available subcommands are:"
+	echo "   chop      Proides a kung fu chop to your repo."
+	echo
+}
+
+
+main() {
+
+  require_git_repo
+
+	if [ $# -lt 1 ]; then
+		usage
+		exit 1
+	fi
+
+	export POSIXLY_CORRECT=1
+
+	SUBCOMMAND="$1";
+
+	# run the specified action
+	$SUBACTION "$@"
+}
+
+chop() {
+  local current_branch=$(git_current_branch)
+  echo "$current_branch got chopped into pieces!!"
+}
+
+main "$@"
